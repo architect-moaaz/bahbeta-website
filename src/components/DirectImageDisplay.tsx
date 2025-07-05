@@ -48,6 +48,8 @@ export function DirectImageDisplay() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('privacy');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -238,8 +240,48 @@ export function DirectImageDisplay() {
 
 
   return (
-    <div ref={containerRef} className="relative bg-black text-white overflow-hidden">
-      {/* Loading Animation */}
+    <>
+      {/* Mobile optimization styles */}
+      <style>{`
+        /* Prevent zoom on inputs */
+        input, select, textarea {
+          font-size: 16px !important;
+        }
+        
+        /* Improve touch targets */
+        button, a {
+          min-height: 44px;
+          min-width: 44px;
+        }
+        
+        /* Smooth scrolling for all devices */
+        html {
+          scroll-behavior: smooth;
+        }
+        
+        /* Optimize for mobile viewport */
+        @media (max-width: 768px) {
+          .text-3xl { font-size: 1.875rem; }
+          .text-4xl { font-size: 2.25rem; }
+          .text-5xl { font-size: 3rem; }
+          .text-6xl { font-size: 3.75rem; }
+        }
+        
+        /* Scroll margin for fixed header */
+        section[id] {
+          scroll-margin-top: 80px;
+        }
+        
+        /* Mobile specific scroll margin */
+        @media (max-width: 768px) {
+          section[id] {
+            scroll-margin-top: 60px;
+          }
+        }
+      `}</style>
+      
+      <div ref={containerRef} className="relative bg-black text-white overflow-hidden touch-manipulation">
+        {/* Loading Animation */}
       <AnimatePresence>
         {!isLoaded && (
           <motion.div
@@ -282,10 +324,10 @@ export function DirectImageDisplay() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
-        className="fixed top-0 w-full z-40 backdrop-blur-xl bg-black/80 border-b border-white/10"
+        className="fixed top-0 w-full z-50 backdrop-blur-xl bg-black/80 border-b border-white/10"
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
             <div className="flex items-center">
               {/* Apple-style Logo */}
               <motion.div 
@@ -295,7 +337,7 @@ export function DirectImageDisplay() {
               >
                 <svg 
                   viewBox="0 0 400 100" 
-                  className="h-7 w-auto"
+                  className="h-6 sm:h-7 w-auto"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <text
@@ -313,8 +355,9 @@ export function DirectImageDisplay() {
               </motion.div>
             </div>
             
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-10">
-              {['Overview', 'Innovation', 'Solutions', 'Contact'].map((item, index) => (
+              {['Overview', 'Innovation', 'Solutions', 'Contact', 'Privacy'].map((item, index) => (
                 <motion.button
                   key={item}
                   onClick={() => {
@@ -334,9 +377,10 @@ export function DirectImageDisplay() {
               ))}
             </div>
 
+            {/* Desktop Get Started Button */}
             <motion.button
               onClick={() => setShowContactForm(true)}
-              className="px-5 py-2 bg-white text-black rounded-full font-medium text-sm hover:bg-gray-100 transition-all duration-300"
+              className="hidden md:block px-5 py-2 bg-white text-black rounded-full font-medium text-sm hover:bg-gray-100 transition-all duration-300"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -345,21 +389,78 @@ export function DirectImageDisplay() {
             >
               Get Started
             </motion.button>
+
+            {/* Mobile hamburger button */}
+            <motion.button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+              whileTap={{ scale: 0.95 }}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </motion.button>
           </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden border-t border-white/10 bg-black/90 backdrop-blur-xl"
+              >
+                <div className="px-4 py-6 space-y-4">
+                  {['Overview', 'Innovation', 'Solutions', 'Contact', 'Privacy'].map((item) => (
+                    <motion.button
+                      key={item}
+                      onClick={() => {
+                        const element = document.getElementById(`section-${item.toLowerCase()}`);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth' });
+                          setMobileMenuOpen(false);
+                        }
+                      }}
+                      className="block w-full text-left text-white/90 hover:text-white font-normal text-lg py-3 transition-colors"
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {item}
+                    </motion.button>
+                  ))}
+                  <motion.button
+                    onClick={() => {
+                      setShowContactForm(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full mt-4 px-6 py-3 bg-white text-black rounded-full font-medium text-base hover:bg-gray-100 transition-all duration-300"
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Get Started
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <motion.section id="section-overview" className="relative min-h-screen flex items-center justify-center px-6">
+      <motion.section id="section-overview" className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 pt-14 sm:pt-16">
         <div className="text-center max-w-7xl mx-auto z-10">
           <motion.div
-            className="mb-16"
+            className="mb-12 sm:mb-16"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 2, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <motion.h1
-              className="text-5xl md:text-7xl lg:text-8xl font-thin mb-8 leading-tight text-white tracking-tight"
+              className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-thin mb-6 sm:mb-8 leading-tight text-white tracking-tight px-2"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 2.2 }}
@@ -368,7 +469,7 @@ export function DirectImageDisplay() {
             </motion.h1>
             
             <motion.h2
-              className="text-2xl md:text-3xl text-gray-300 mb-8 font-light tracking-wide"
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-6 sm:mb-8 font-light tracking-wide px-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 2.4 }}
@@ -377,7 +478,7 @@ export function DirectImageDisplay() {
             </motion.h2>
             
             <motion.p
-              className="text-xl md:text-2xl text-gray-400 mb-12 leading-relaxed max-w-4xl mx-auto font-light"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 mb-8 sm:mb-12 leading-relaxed max-w-4xl mx-auto font-light px-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 2.6 }}
@@ -386,14 +487,14 @@ export function DirectImageDisplay() {
             </motion.p>
 
             <motion.div
-              className="flex flex-col sm:flex-row gap-6 justify-center mb-20"
+              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-12 sm:mb-20 px-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 2.8 }}
             >
               <motion.button
                 onClick={() => setShowContactForm(true)}
-                className="px-10 py-4 bg-white text-black rounded-full font-medium text-lg hover:bg-gray-100 transition-all duration-300"
+                className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black rounded-full font-medium text-base sm:text-lg hover:bg-gray-100 transition-all duration-300"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -406,7 +507,7 @@ export function DirectImageDisplay() {
                     element.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="px-10 py-4 border border-white/30 text-white rounded-full font-medium text-lg hover:bg-white/10 transition-all duration-300"
+                className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 border border-white/30 text-white rounded-full font-medium text-base sm:text-lg hover:bg-white/10 transition-all duration-300"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -417,7 +518,7 @@ export function DirectImageDisplay() {
 
           {/* Stats Section */}
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 max-w-4xl mx-auto px-4"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 3 }}
@@ -430,8 +531,8 @@ export function DirectImageDisplay() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 3.2 + index * 0.1 }}
               >
-                <div className="text-3xl md:text-4xl font-light text-white mb-2">{stat.number}</div>
-                <div className="text-sm md:text-base text-gray-400 font-light tracking-wide">{stat.label}</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-1 sm:mb-2">{stat.number}</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-400 font-light tracking-wide">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -439,23 +540,10 @@ export function DirectImageDisplay() {
       </motion.section>
 
       {/* Our Solutions - Contained Scrolling 3D Experience */}
-      <motion.section id="section-solutions" className="py-32 px-6">
+      <motion.section id="section-solutions" className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-6xl font-light text-white mb-6 tracking-tight">Our Solutions</h2>
-            <p className="text-xl text-gray-400 font-light max-w-3xl mx-auto">
-              Comprehensive technology services designed to accelerate your business growth
-            </p>
-          </motion.div>
-
           {/* Contained Scrolling Theater */}
-          <div className="h-[600px] w-full rounded-3xl overflow-hidden bg-black/20 backdrop-blur-sm border border-white/10 relative">
+          <div className="h-[400px] sm:h-[500px] lg:h-[600px] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-black/20 backdrop-blur-sm border border-white/10 relative">
             {/* Fixed 3D Theater Background */}
             <div className="absolute inset-0">
               <Suspense fallback={
@@ -477,22 +565,25 @@ export function DirectImageDisplay() {
               {/* What We Do Section */}
               <div className="h-full flex items-center justify-center">
                 <motion.div
-                  className="text-center max-w-2xl mx-auto px-8"
+                  className="text-center max-w-2xl mx-auto px-4 sm:px-6 lg:px-8"
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8 }}
                   viewport={{ once: true }}
                 >
-                  <h2 className="text-5xl md:text-6xl font-light text-white mb-6 tracking-tight">What We Do</h2>
-                  <p className="text-xl text-gray-400 font-light mb-12">
-                    Scroll to explore our comprehensive technology services
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-4 sm:mb-6 tracking-tight">What We Do</h2>
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-400 font-light mb-2">
+                    Comprehensive technology services designed to accelerate your business growth
+                  </p>
+                  <p className="text-sm sm:text-base text-gray-500 font-light mb-8 sm:mb-12">
+                    Scroll to explore our solutions
                   </p>
                   <motion.div 
                     className="inline-block"
                     animate={{ y: [0, 10, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <svg className="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </motion.div>
@@ -501,7 +592,7 @@ export function DirectImageDisplay() {
 
               {/* Individual Service Sections */}
               {services.map((service, index) => (
-                <div key={index} className="h-full flex items-center justify-center px-12">
+                <div key={index} className="h-full flex items-center justify-center px-4 sm:px-6 lg:px-12">
                   <motion.div
                     className="max-w-2xl mx-auto w-full"
                     initial={{ opacity: 0, y: 30 }}
@@ -509,23 +600,23 @@ export function DirectImageDisplay() {
                     transition={{ duration: 0.6 }}
                     viewport={{ once: true }}
                   >
-                    <div className="bg-white/10 backdrop-blur-md rounded-3xl p-12 border border-white/20 text-center">
-                      <h3 className="text-3xl md:text-4xl font-medium mb-4 text-white">
+                    <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/20 text-center">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium mb-3 sm:mb-4 text-white">
                         {service.title}
                       </h3>
-                      <h4 className="text-xl text-gray-300 mb-6 font-light">
+                      <h4 className="text-base sm:text-lg lg:text-xl text-gray-300 mb-4 sm:mb-6 font-light">
                         {service.subtitle}
                       </h4>
-                      <p className="text-base text-gray-400 mb-8 leading-relaxed font-light max-w-xl mx-auto">
+                      <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 leading-relaxed font-light max-w-xl mx-auto">
                         {service.description}
                       </p>
-                      <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 max-w-lg mx-auto">
                         {service.features.map((feature, featureIndex) => (
                           <div
                             key={featureIndex}
-                            className="flex items-center text-sm text-gray-300"
+                            className="flex items-center text-xs sm:text-sm text-gray-300 justify-center sm:justify-start"
                           >
-                            <div className="w-1 h-1 bg-white rounded-full mr-3 flex-shrink-0"></div>
+                            <div className="w-1 h-1 bg-white rounded-full mr-2 sm:mr-3 flex-shrink-0"></div>
                             {feature}
                           </div>
                         ))}
@@ -538,18 +629,18 @@ export function DirectImageDisplay() {
               {/* End Section */}
               <div className="h-full flex items-center justify-center">
                 <motion.div
-                  className="text-center max-w-2xl mx-auto px-8"
+                  className="text-center max-w-2xl mx-auto px-4 sm:px-6 lg:px-8"
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.8 }}
                   viewport={{ once: true }}
                 >
-                  <h2 className="text-4xl md:text-5xl font-light text-white mb-8">Ready to Transform?</h2>
-                  <p className="text-xl text-gray-400 mb-12 font-light">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-white mb-6 sm:mb-8">Ready to Transform?</h2>
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-8 sm:mb-12 font-light">
                     Let's build something extraordinary together
                   </p>
                   <motion.button
-                    className="px-8 py-4 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-colors"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-full text-base sm:text-lg font-medium hover:bg-gray-100 transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowContactForm(true)}
@@ -564,20 +655,20 @@ export function DirectImageDisplay() {
       </motion.section>
 
       {/* Testimonials Carousel Section */}
-      <motion.section id="section-innovation" className="py-32 px-6">
+      <motion.section id="section-innovation" className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-16 lg:mb-20"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-light text-white mb-6 tracking-tight">What Our Clients Say</h2>
-            <p className="text-xl text-gray-400 font-light max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-4 sm:mb-6 tracking-tight">What Our Clients Say</h2>
+            <p className="text-base sm:text-lg lg:text-xl text-gray-400 font-light max-w-3xl mx-auto px-4">
               Trusted by Industry Leaders Across Bahrain
             </p>
-            <p className="text-lg text-gray-500 mt-4 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-500 mt-3 sm:mt-4 max-w-4xl mx-auto leading-relaxed px-4">
               At BahBeta, we take pride in building long-term relationships grounded in trust, performance, and results. Here's what some of our valued clients have to say:
             </p>
           </motion.div>
@@ -666,28 +757,28 @@ export function DirectImageDisplay() {
 
           {/* Trust Indicators */}
           <motion.div
-            className="mt-20 text-center"
+            className="mt-12 sm:mt-16 lg:mt-20 text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             viewport={{ once: true }}
           >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-light text-white mb-2">50+</div>
-                <div className="text-sm md:text-base text-gray-400 font-light">Happy Clients</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-1 sm:mb-2">50+</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-400 font-light">Projects Delivered</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-light text-white mb-2">100%</div>
-                <div className="text-sm md:text-base text-gray-400 font-light">Client Satisfaction</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-1 sm:mb-2">15+</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-400 font-light">Years Experience</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-light text-white mb-2">24/7</div>
-                <div className="text-sm md:text-base text-gray-400 font-light">Support Available</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-1 sm:mb-2">500+</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-400 font-light">Happy Clients</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-light text-white mb-2">5★</div>
-                <div className="text-sm md:text-base text-gray-400 font-light">Average Rating</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-1 sm:mb-2">24/7</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-400 font-light">Support Available</div>
               </div>
             </div>
           </motion.div>
@@ -695,24 +786,24 @@ export function DirectImageDisplay() {
       </motion.section>
 
       {/* Contact Section */}
-      <motion.section id="section-contact" className="py-32 px-6">
+      <motion.section id="section-contact" className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
-            className="bg-white/10 backdrop-blur-lg rounded-3xl p-16 border border-white/10"
+            className="bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-16 border border-white/10"
             initial={{ opacity: 0, y: 60 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-light text-white mb-6 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-4 sm:mb-6 tracking-tight">
               Ready to Transform Your Business?
             </h2>
-            <p className="text-xl text-gray-400 mb-12 font-light leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-8 sm:mb-12 font-light leading-relaxed">
               Let's discuss how BahBeta can help you achieve your technology goals with precision and excellence.
             </p>
             
             <motion.div
-              className="flex justify-center mb-12"
+              className="flex justify-center mb-8 sm:mb-12"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -720,7 +811,7 @@ export function DirectImageDisplay() {
             >
               <motion.button
                 onClick={() => setShowContactForm(true)}
-                className="px-8 py-4 bg-white text-black rounded-full font-medium text-lg hover:bg-gray-100 transition-all duration-300"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-full font-medium text-base sm:text-lg hover:bg-gray-100 transition-all duration-300"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -732,6 +823,458 @@ export function DirectImageDisplay() {
               <p>Office #2211, Bldg #747, Road #1124, Block #311</p>
               <p>Manama, Kingdom of Bahrain</p>
               <p className="mt-4">+973 33283222 | support@bahbeta.com</p>
+            </div>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* We Care For You Section - Privacy & Cookies */}
+      <motion.section id="section-privacy" className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6 bg-black/20">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-light text-white mb-4 tracking-tight">
+              We Care For You
+            </h2>
+            <p className="text-base sm:text-lg text-gray-400 font-light">
+              Your privacy and trust are important to us. Learn how we protect and respect your data.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl border border-white/10 overflow-hidden"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            {/* Tab Navigation - Fixed at top */}
+            <div className="flex space-x-4 p-8 sm:p-12 pb-4 border-b border-white/20 bg-white/5 backdrop-blur-sm">
+              <motion.button
+                onClick={() => setActiveTab('privacy')}
+                className={`pb-4 px-2 text-lg font-light transition-colors ${
+                  activeTab === 'privacy' 
+                    ? 'text-white border-b-2 border-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Privacy Policy
+              </motion.button>
+              <motion.button
+                onClick={() => setActiveTab('cookies')}
+                className={`pb-4 px-2 text-lg font-light transition-colors ${
+                  activeTab === 'cookies' 
+                    ? 'text-white border-b-2 border-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Cookies Policy
+              </motion.button>
+            </div>
+
+            {/* Scrollable Tab Content */}
+            <div className="h-[400px] sm:h-[500px] lg:h-[600px] overflow-y-auto p-8 sm:p-12 pt-8 scrollbar-thin scrollbar-track-white/5 scrollbar-thumb-white/20 hover:scrollbar-thumb-white/30">
+              <AnimatePresence mode="wait">
+              {activeTab === 'privacy' && (
+                <motion.div
+                  key="privacy"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="prose prose-invert max-w-none"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Information We Collect</h3>
+                    <motion.div
+                      className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                      whileHover={{ scale: 1.01, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        We collect information you provide directly to us through our contact forms, consultation requests, and communication with our team.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                          <span className="text-white font-medium">Contact Information</span>
+                          <p className="text-gray-400 mt-2">Name, email address, phone number</p>
+                        </div>
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                          <span className="text-white font-medium">Business Information</span>
+                          <p className="text-gray-400 mt-2">Company details, project requirements</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">How We Use Your Information</h3>
+                    <div className="space-y-3">
+                      {[
+                        { title: "Consultation Services", desc: "Respond to your inquiries and provide expert guidance" },
+                        { title: "Solution Delivery", desc: "Deliver the technology solutions you request" },
+                        { title: "Service Improvement", desc: "Enhance our services and user experience" },
+                        { title: "Updates & Communication", desc: "Send relevant updates with your consent" },
+                        { title: "Legal Compliance", desc: "Comply with legal obligations and protect our rights" }
+                      ].map((item, index) => (
+                        <motion.div
+                          key={index}
+                          className="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20"
+                          whileHover={{ scale: 1.01, x: 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <h4 className="text-white font-medium mb-2">{item.title}</h4>
+                          <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Data Protection</h3>
+                    <motion.div
+                      className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                      whileHover={{ scale: 1.01, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        We implement cutting-edge security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-center">
+                          <span className="text-white font-medium">Encryption</span>
+                          <p className="text-gray-400 mt-2">End-to-end data encryption</p>
+                        </div>
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-center">
+                          <span className="text-white font-medium">Access Control</span>
+                          <p className="text-gray-400 mt-2">Limited to authorized personnel</p>
+                        </div>
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-center">
+                          <span className="text-white font-medium">Monitoring</span>
+                          <p className="text-gray-400 mt-2">24/7 security monitoring</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Your Rights</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        { title: "Access", desc: "View your personal information" },
+                        { title: "Update", desc: "Modify your data anytime" },
+                        { title: "Delete", desc: "Request data removal" },
+                        { title: "Portability", desc: "Export your data" }
+                      ].map((right, index) => (
+                        <motion.div
+                          key={index}
+                          className="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20"
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <h4 className="text-white font-medium mb-2">{right.title}</h4>
+                          <p className="text-gray-400 text-sm leading-relaxed">{right.desc}</p>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Contact Information</h3>
+                    <motion.div
+                      className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                      whileHover={{ scale: 1.01, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        Questions about your privacy? We're here to help and ensure your data is handled with the utmost care.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                          <p className="text-white font-medium mb-2">BahBeta Technology Solutions</p>
+                          <p className="text-gray-300 text-sm">Office #2211, Bldg #747, Road #1124, Block #311</p>
+                          <p className="text-gray-300 text-sm">Manama, Kingdom of Bahrain</p>
+                        </div>
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                          <div className="mb-3">
+                            <span className="text-white font-medium">Email:</span>
+                            <p className="text-gray-300 text-sm">support@bahbeta.com</p>
+                          </div>
+                          <div>
+                            <span className="text-white font-medium">Phone:</span>
+                            <p className="text-gray-300 text-sm">+973 33283222</p>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                    className="text-center"
+                  >
+                    <div className="bg-white/5 p-4 rounded-lg border border-white/10 inline-block">
+                      <p className="text-gray-400 text-sm font-light">
+                        Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {activeTab === 'cookies' && (
+                <motion.div
+                  key="cookies"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="prose prose-invert max-w-none"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">What Are Cookies?</h3>
+                    <motion.div
+                      className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                      whileHover={{ scale: 1.01, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        Cookies are small text files stored on your device when you visit our website. Think of them as helpful digital notes that remember your preferences and enhance your browsing experience.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-center">
+                          <span className="text-white font-medium">Storage</span>
+                          <p className="text-gray-400 mt-2">Tiny files on your device</p>
+                        </div>
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-center">
+                          <span className="text-white font-medium">Performance</span>
+                          <p className="text-gray-400 mt-2">Faster website loading</p>
+                        </div>
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-center">
+                          <span className="text-white font-medium">Personalization</span>
+                          <p className="text-gray-400 mt-2">Customized experience</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Types of Cookies We Use</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        { 
+                          title: "Essential Cookies", 
+                          desc: "Core website functionality",
+                          detail: "Enable basic features like page navigation and secure area access"
+                        },
+                        { 
+                          title: "Analytics Cookies", 
+                          desc: "Website usage insights",
+                          detail: "Help us understand visitor behavior to improve our services"
+                        },
+                        { 
+                          title: "Performance Cookies", 
+                          desc: "Speed optimization",
+                          detail: "Track page visits to optimize website performance"
+                        },
+                        { 
+                          title: "Functionality Cookies", 
+                          desc: "Enhanced features",
+                          detail: "Remember your choices for a personalized experience"
+                        }
+                      ].map((cookie, index) => (
+                        <motion.div
+                          key={index}
+                          className="bg-white/10 backdrop-blur-sm p-5 rounded-xl border border-white/20"
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="mb-3">
+                            <h4 className="text-white font-medium text-lg mb-2">{cookie.title}</h4>
+                            <p className="text-gray-300 text-sm font-medium">{cookie.desc}</p>
+                          </div>
+                          <p className="text-gray-400 text-sm leading-relaxed">{cookie.detail}</p>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Managing Your Cookie Preferences</h3>
+                    <motion.div
+                      className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                      whileHover={{ scale: 1.01, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        You're in complete control of your cookie preferences. Customize your experience by managing your browser settings.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[
+                          { browser: "Chrome", path: "Settings → Privacy → Site settings → Cookies" },
+                          { browser: "Firefox", path: "Options → Privacy → Cookies and Site Data" },
+                          { browser: "Safari", path: "Preferences → Privacy → Cookies" },
+                          { browser: "Edge", path: "Settings → Site permissions → Cookies" }
+                        ].map((browser, index) => (
+                          <motion.div
+                            key={index}
+                            className="bg-white/5 p-4 rounded-lg border border-white/10"
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className="mb-2">
+                              <span className="text-white font-medium">{browser.browser}</span>
+                            </div>
+                            <p className="text-gray-400 text-sm">{browser.path}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Cookie Retention</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <motion.div
+                        className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                        whileHover={{ scale: 1.01, y: -2 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="mb-4">
+                          <h4 className="text-white font-medium text-lg mb-2">Session Cookies</h4>
+                          <p className="text-gray-300 text-sm font-medium">Temporary & Secure</p>
+                        </div>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                          Automatically deleted when you close your browser. These ensure your session remains secure and don't persist on your device.
+                        </p>
+                      </motion.div>
+
+                      <motion.div
+                        className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                        whileHover={{ scale: 1.01, y: -2 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="mb-4">
+                          <h4 className="text-white font-medium text-lg mb-2">Persistent Cookies</h4>
+                          <p className="text-gray-300 text-sm font-medium">Long-term Preferences</p>
+                        </div>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                          Remain on your device for a set period to remember your preferences. You can delete them anytime through browser settings.
+                        </p>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                    className="mb-8"
+                  >
+                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Contact Information</h3>
+                    <motion.div
+                      className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
+                      whileHover={{ scale: 1.01, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        Have questions about cookies or need assistance with your preferences? Our team is here to help you navigate your digital experience with confidence.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                          <div className="mb-3">
+                            <span className="text-white font-medium">BahBeta Technology Solutions</span>
+                          </div>
+                          <p className="text-gray-400 text-sm">Office #2211, Bldg #747, Road #1124, Block #311</p>
+                          <p className="text-gray-400 text-sm">Manama, Kingdom of Bahrain</p>
+                        </div>
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                          <div className="mb-3">
+                            <span className="text-white font-medium">Email:</span>
+                            <p className="text-gray-300 text-sm">support@bahbeta.com</p>
+                          </div>
+                          <div>
+                            <span className="text-white font-medium">Phone:</span>
+                            <p className="text-gray-300 text-sm">+973 33283222</p>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                    className="text-center"
+                  >
+                    <div className="bg-white/5 p-4 rounded-lg border border-white/10 inline-block">
+                      <p className="text-gray-400 text-sm font-light">
+                        Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             </div>
           </motion.div>
         </div>
@@ -890,6 +1433,7 @@ export function DirectImageDisplay() {
         )}
       </AnimatePresence>
 
-    </div>
+      </div>
+    </>
   );
 }
