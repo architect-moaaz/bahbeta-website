@@ -231,10 +231,10 @@ export function DirectImageDisplay() {
     subtitle: "Custom Solutions. Global Standards. Local Expertise.",
     description: "From mobile apps to AI-powered solutions, from secure payment gateways to smart NFC cards — BahBeta transforms your digital vision into reality.",
     stats: [
-      { number: "500+", label: "Projects Delivered" },
-      { number: "99.9%", label: "Uptime Guarantee" },
-      { number: "24/7", label: "Expert Support" },
-      { number: "10+", label: "Years Experience" }
+      { number: "50+", label: "Projects Delivered" },
+      { number: "15+", label: "Years Experience" },
+      { number: "500+", label: "Happy Clients" },
+      { number: "24/7", label: "Support Available" }
     ]
   };
 
