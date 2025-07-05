@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apple-inspired typography system */
+:root {
+  font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #1d1d1f;
+  overflow-x: hidden;
+  font-size: 17px;
+  line-height: 1.47;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Apple-style typography scale */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+}
+
+/* Apple-style smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Apple button styles */
+@layer utilities {
+  .apple-button {
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-weight: 400;
+    letter-spacing: -0.003em;
+  }
+  
+  .apple-button:hover {
+    transform: translateY(-1px);
+  }
+  
+  .apple-card {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .apple-text-large {
+    font-size: 48px;
+    line-height: 1.08;
+    font-weight: 600;
+    letter-spacing: -0.003em;
+  }
+  
+  .apple-text-headline {
+    font-size: 32px;
+    line-height: 1.125;
+    font-weight: 600;
+    letter-spacing: 0.004em;
+  }
+  
+  .apple-text-body {
+    font-size: 19px;
+    line-height: 1.42;
+    font-weight: 400;
+    letter-spacing: 0.012em;
+  }
+  
+  @media (max-width: 768px) {
+    .apple-text-large {
+      font-size: 32px;
+      line-height: 1.125;
+    }
+    
+    .apple-text-headline {
+      font-size: 28px;
+      line-height: 1.14;
+    }
+    
+    .apple-text-body {
+      font-size: 17px;
+      line-height: 1.47;
+    }
+  }
+}
