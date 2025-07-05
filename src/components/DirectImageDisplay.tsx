@@ -315,9 +315,14 @@ export function DirectImageDisplay() {
             
             <div className="hidden md:flex items-center space-x-10">
               {['Overview', 'Innovation', 'Solutions', 'Contact'].map((item, index) => (
-                <motion.a
+                <motion.button
                   key={item}
-                  href={`#section-${item.toLowerCase()}`}
+                  onClick={() => {
+                    const element = document.getElementById(`section-${item.toLowerCase()}`);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
                   className="text-white/90 hover:text-white font-normal text-sm tracking-wide transition-all duration-300"
                   whileHover={{ y: -1 }}
                   initial={{ opacity: 0, y: -10 }}
@@ -325,7 +330,7 @@ export function DirectImageDisplay() {
                   transition={{ duration: 0.4, delay: 1.4 + index * 0.1 }}
                 >
                   {item}
-                </motion.a>
+                </motion.button>
               ))}
             </div>
 
@@ -345,7 +350,7 @@ export function DirectImageDisplay() {
       </motion.nav>
 
       {/* Hero Section */}
-      <motion.section className="relative min-h-screen flex items-center justify-center px-6">
+      <motion.section id="section-overview" className="relative min-h-screen flex items-center justify-center px-6">
         <div className="text-center max-w-7xl mx-auto z-10">
           <motion.div
             className="mb-16"
@@ -395,6 +400,12 @@ export function DirectImageDisplay() {
                 Start Your Project
               </motion.button>
               <motion.button
+                onClick={() => {
+                  const element = document.getElementById('section-solutions');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className="px-10 py-4 border border-white/30 text-white rounded-full font-medium text-lg hover:bg-white/10 transition-all duration-300"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
@@ -428,7 +439,7 @@ export function DirectImageDisplay() {
       </motion.section>
 
       {/* Our Solutions - Contained Scrolling 3D Experience */}
-      <motion.section className="py-32 px-6">
+      <motion.section id="section-solutions" className="py-32 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             className="text-center mb-20"
@@ -553,7 +564,7 @@ export function DirectImageDisplay() {
       </motion.section>
 
       {/* Testimonials Carousel Section */}
-      <motion.section className="py-32 px-6">
+      <motion.section id="section-innovation" className="py-32 px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
             className="text-center mb-20"
@@ -684,7 +695,7 @@ export function DirectImageDisplay() {
       </motion.section>
 
       {/* Contact Section */}
-      <motion.section className="py-32 px-6">
+      <motion.section id="section-contact" className="py-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             className="bg-white/10 backdrop-blur-lg rounded-3xl p-16 border border-white/10"
