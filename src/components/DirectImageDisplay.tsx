@@ -67,20 +67,49 @@ export function DirectImageDisplay() {
   }, []);
 
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', formData);
-    alert('Thank you for your inquiry! We will contact you within 24 hours.');
-    setShowContactForm(false);
-    setFormData({
-      name: '',
-      email: '',
-      company: '',
-      phone: '',
-      service: '',
-      message: ''
-    });
+    
+    // Show loading state
+    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Sending...';
+    submitButton.disabled = true;
+
+    try {
+      // Send email via API endpoint
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message || 'Thank you for your inquiry! We will contact you within 24 hours.');
+        setShowContactForm(false);
+        setFormData({
+          name: '',
+          email: '',
+          company: '',
+          phone: '',
+          service: '',
+          message: ''
+        });
+      } else {
+        alert(result.message || 'Failed to send message. Please try again or contact us directly at support@bahbeta.com');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      alert('Failed to send message. Please try again or contact us directly at support@bahbeta.com');
+    } finally {
+      // Reset button state
+      submitButton.textContent = originalText || 'Send Inquiry';
+      submitButton.disabled = false;
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -1432,6 +1461,17 @@ export function DirectImageDisplay() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Copyright Footer */}
+      <footer className="bg-black/50 backdrop-blur-sm border-t border-white/10 py-6 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <p className="text-gray-400 text-sm font-light">
+              © {new Date().getFullYear()} BahBeta Technology Solutions. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
 
       </div>
     </>
