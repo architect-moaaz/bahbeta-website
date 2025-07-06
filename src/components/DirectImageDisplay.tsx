@@ -3,6 +3,13 @@ import { motion, useScroll, AnimatePresence } from 'framer-motion';
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { Text, Stars } from '@react-three/drei';
 import * as THREE from 'three';
+import { 
+  trackContactFormSubmit, 
+  trackNavigationClick, 
+  trackCTAClick, 
+  trackPrivacyView,
+  trackMobileMenuToggle
+} from '../utils/analytics';
 
 // Service definitions
 const services = [
@@ -89,6 +96,12 @@ export function DirectImageDisplay() {
       const result = await response.json();
 
       if (result.success) {
+        // Track successful form submission
+        trackContactFormSubmit({
+          service: formData.service,
+          company: formData.company
+        });
+        
         alert(result.message || 'Thank you for your inquiry! We will contact you within 24 hours.');
         setShowContactForm(false);
         setFormData({
@@ -421,7 +434,11 @@ export function DirectImageDisplay() {
 
             {/* Mobile hamburger button */}
             <motion.button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => {
+                const newState = !mobileMenuOpen;
+                setMobileMenuOpen(newState);
+                trackMobileMenuToggle(newState);
+              }}
               className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
               whileTap={{ scale: 0.95 }}
             >
@@ -522,7 +539,10 @@ export function DirectImageDisplay() {
               transition={{ duration: 1, delay: 2.8 }}
             >
               <motion.button
-                onClick={() => setShowContactForm(true)}
+                onClick={() => {
+                  trackCTAClick('Start Your Project');
+                  setShowContactForm(true);
+                }}
                 className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-black rounded-full font-medium text-base sm:text-lg hover:bg-gray-100 transition-all duration-300"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
@@ -531,6 +551,7 @@ export function DirectImageDisplay() {
               </motion.button>
               <motion.button
                 onClick={() => {
+                  trackCTAClick('View Our Work');
                   const element = document.getElementById('section-solutions');
                   if (element) {
                     element.scrollIntoView({ behavior: 'smooth' });
@@ -633,9 +654,9 @@ export function DirectImageDisplay() {
                       <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium mb-3 sm:mb-4 text-white">
                         {service.title}
                       </h3>
-                      <h4 className="text-base sm:text-lg lg:text-xl text-gray-300 mb-4 sm:mb-6 font-light">
+                      <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-4 sm:mb-6 font-light">
                         {service.subtitle}
-                      </h4>
+                      </p>
                       <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 leading-relaxed font-light max-w-xl mx-auto">
                         {service.description}
                       </p>
@@ -664,7 +685,7 @@ export function DirectImageDisplay() {
                   transition={{ duration: 0.8 }}
                   viewport={{ once: true }}
                 >
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-white mb-6 sm:mb-8">Ready to Transform?</h2>
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-white mb-6 sm:mb-8">Ready to Transform?</h3>
                   <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-8 sm:mb-12 font-light">
                     Let's build something extraordinary together
                   </p>
@@ -773,7 +794,7 @@ export function DirectImageDisplay() {
               <motion.button
                 key={index}
                 onClick={() => setCurrentTestimonial(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                   index === currentTestimonial 
                     ? 'bg-white' 
                     : 'bg-white/30 hover:bg-white/50'
@@ -885,7 +906,10 @@ export function DirectImageDisplay() {
             {/* Tab Navigation - Fixed at top */}
             <div className="flex space-x-4 p-8 sm:p-12 pb-4 border-b border-white/20 bg-white/5 backdrop-blur-sm">
               <motion.button
-                onClick={() => setActiveTab('privacy')}
+                onClick={() => {
+                  setActiveTab('privacy');
+                  trackPrivacyView('privacy');
+                }}
                 className={`pb-4 px-2 text-lg font-light transition-colors ${
                   activeTab === 'privacy' 
                     ? 'text-white border-b-2 border-white' 
@@ -897,7 +921,10 @@ export function DirectImageDisplay() {
                 Privacy Policy
               </motion.button>
               <motion.button
-                onClick={() => setActiveTab('cookies')}
+                onClick={() => {
+                  setActiveTab('cookies');
+                  trackPrivacyView('cookies');
+                }}
                 className={`pb-4 px-2 text-lg font-light transition-colors ${
                   activeTab === 'cookies' 
                     ? 'text-white border-b-2 border-white' 
@@ -928,7 +955,7 @@ export function DirectImageDisplay() {
                     transition={{ duration: 0.5, delay: 0.1 }}
                     className="mb-8"
                   >
-                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Information We Collect</h3>
+                    <h4 className="text-xl sm:text-2xl font-light text-white mb-6">Information We Collect</h4>
                     <motion.div
                       className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
                       whileHover={{ scale: 1.01, y: -2 }}
@@ -956,7 +983,7 @@ export function DirectImageDisplay() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="mb-8"
                   >
-                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">How We Use Your Information</h3>
+                    <h4 className="text-xl sm:text-2xl font-light text-white mb-6">How We Use Your Information</h4>
                     <div className="space-y-3">
                       {[
                         { title: "Consultation Services", desc: "Respond to your inquiries and provide expert guidance" },
@@ -971,7 +998,7 @@ export function DirectImageDisplay() {
                           whileHover={{ scale: 1.01, x: 5 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <h4 className="text-white font-medium mb-2">{item.title}</h4>
+                          <h5 className="text-white font-medium mb-2">{item.title}</h5>
                           <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
                         </motion.div>
                       ))}
@@ -984,7 +1011,7 @@ export function DirectImageDisplay() {
                     transition={{ duration: 0.5, delay: 0.3 }}
                     className="mb-8"
                   >
-                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Data Protection</h3>
+                    <h4 className="text-xl sm:text-2xl font-light text-white mb-6">Data Protection</h4>
                     <motion.div
                       className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20"
                       whileHover={{ scale: 1.01, y: -2 }}
@@ -1016,7 +1043,7 @@ export function DirectImageDisplay() {
                     transition={{ duration: 0.5, delay: 0.4 }}
                     className="mb-8"
                   >
-                    <h3 className="text-xl sm:text-2xl font-light text-white mb-6">Your Rights</h3>
+                    <h4 className="text-xl sm:text-2xl font-light text-white mb-6">Your Rights</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
                         { title: "Access", desc: "View your personal information" },

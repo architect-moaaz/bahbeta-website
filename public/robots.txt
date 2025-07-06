@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Important pages
+Allow: /#section-overview
+Allow: /#section-solutions
+Allow: /#section-testimonials
+Allow: /#section-contact
+Allow: /#section-privacy
+
+# Sitemaps
+Sitemap: https://bahbeta.com/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Block access to sensitive areas
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: /.git/
