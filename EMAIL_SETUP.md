@@ -82,10 +82,31 @@ After deployment, test the contact form to ensure emails are being sent correctl
 
 ### Common Issues:
 
-1. **Authentication Failed**: Check app password is correct
-2. **Connection Timeout**: Ensure correct SMTP settings
-3. **Emails Going to Spam**: Set up proper SPF/DKIM records
-4. **Rate Limiting**: Google has sending limits, consider using a service like SendGrid for high volume
+1. **FUNCTION_INVOCATION_FAILED**: 
+   - Check that `nodemailer` is in `dependencies` (not `devDependencies`) in package.json
+   - Ensure environment variables are set in Vercel dashboard
+   - Verify the API endpoint is at `/api/send-email.ts` (not `/api/send-email.js`)
+
+2. **Authentication Failed**: 
+   - Check app password is correct (16 characters, no spaces)
+   - Verify 2-Step Verification is enabled for the Google account
+   - Use an App Password, not your regular Google password
+
+3. **Connection Timeout**: 
+   - Ensure correct SMTP settings (smtp.gmail.com, port 587)
+   - Check if Google Workspace has any security restrictions
+
+4. **Emails Going to Spam**: 
+   - Set up proper SPF/DKIM records for your domain
+   - Use a verified domain for sending
+
+5. **Rate Limiting**: 
+   - Google has sending limits, consider using SendGrid for high volume
+
+6. **Environment Variables Missing**:
+   - In Vercel: Go to Project Settings > Environment Variables
+   - Add: `GMAIL_USER` and `GMAIL_APP_PASSWORD`
+   - Redeploy after adding environment variables
 
 ### Testing Locally:
 

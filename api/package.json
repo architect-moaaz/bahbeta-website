@@ -1,0 +1,6 @@
+{
+  "type": "commonjs",
+  "dependencies": {
+    "nodemailer": "^7.0.4"
+  }
+}

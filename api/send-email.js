@@ -1,10 +1,18 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import nodemailer from 'nodemailer';
+// CommonJS format for Vercel serverless function
+const nodemailer = require('nodemailer');
 
-// This is a Vercel Serverless Function for sending emails
-// Deploy this with your Vercel project
+module.exports = async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -19,8 +27,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  // Check for environment variables
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.error('Missing email configuration environment variables');
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Email service is temporarily unavailable. Please contact us directly at support@bahbeta.com or call +973 33283222' 
+    });
+  }
+
   // Create transporter using Google Workspace SMTP
-  const transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransporter({
     host: 'smtp.gmail.com',
     port: 587,
     secure: false, // true for 465, false for other ports
@@ -114,7 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error('Email sending error:', error);
     return res.status(500).json({ 
       success: false, 
-      message: 'Failed to send email. Please try again later.' 
+      message: 'Email service is temporarily unavailable. Please contact us directly at support@bahbeta.com or call +973 33283222' 
     });
   }
-}
+};
