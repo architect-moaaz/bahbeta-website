@@ -65,6 +65,9 @@ export function DirectImageDisplay() {
     service: '',
     message: ''
   });
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   
 
@@ -102,7 +105,8 @@ export function DirectImageDisplay() {
           company: formData.company
         });
         
-        alert(result.message || 'Thank you for your inquiry! We will contact you within 24 hours.');
+        setPopupMessage(result.message || 'Thank you for your inquiry! We will contact you within 24 hours.');
+        setShowSuccessPopup(true);
         setShowContactForm(false);
         setFormData({
           name: '',
@@ -113,11 +117,13 @@ export function DirectImageDisplay() {
           message: ''
         });
       } else {
-        alert(result.message || 'Failed to send message. Please try again or contact us directly at support@bahbeta.com');
+        setPopupMessage(result.message || 'Failed to send message. Please try again or contact us directly at support@bahbeta.com');
+        setShowErrorPopup(true);
       }
     } catch (error) {
       console.error('Form submission error:', error);
-      alert('Failed to send message. Please try again or contact us directly at support@bahbeta.com');
+      setPopupMessage('Failed to send message. Please try again or contact us directly at support@bahbeta.com');
+      setShowErrorPopup(true);
     } finally {
       // Reset button state
       submitButton.textContent = originalText || 'Send Inquiry';
@@ -1484,6 +1490,123 @@ export function DirectImageDisplay() {
                   </motion.button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Success Popup */}
+      <AnimatePresence>
+        {showSuccessPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowSuccessPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              className="bg-gradient-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-xl rounded-3xl p-8 border border-green-400/30 max-w-md w-full text-center shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, duration: 0.5, type: "spring", stiffness: 200 }}
+                className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+              >
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </motion.div>
+              
+              <h3 className="text-2xl font-semibold text-white mb-4">Message Sent!</h3>
+              
+              <p className="text-gray-300 mb-8 leading-relaxed">
+                {popupMessage}
+              </p>
+              
+              <motion.button
+                onClick={() => setShowSuccessPopup(false)}
+                className="px-8 py-3 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Awesome!
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Error Popup */}
+      <AnimatePresence>
+        {showErrorPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowErrorPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              className="bg-gradient-to-br from-red-500/20 to-orange-600/20 backdrop-blur-xl rounded-3xl p-8 border border-red-400/30 max-w-md w-full text-center shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, duration: 0.5, type: "spring", stiffness: 200 }}
+                className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-6"
+              >
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </motion.div>
+              
+              <h3 className="text-2xl font-semibold text-white mb-4">Oops!</h3>
+              
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                {popupMessage}
+              </p>
+              
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/20">
+                <p className="text-sm text-gray-300 mb-2">
+                  <strong>Direct Contact:</strong>
+                </p>
+                <p className="text-sm text-blue-300">support@bahbeta.com</p>
+                <p className="text-sm text-blue-300">+973 33283222</p>
+              </div>
+              
+              <div className="flex gap-3">
+                <motion.button
+                  onClick={() => setShowErrorPopup(false)}
+                  className="flex-1 px-6 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Try Again
+                </motion.button>
+                <motion.button
+                  onClick={() => {
+                    setShowErrorPopup(false);
+                    window.location.href = 'mailto:support@bahbeta.com';
+                  }}
+                  className="flex-1 px-6 py-3 border border-white/30 text-white rounded-full font-medium hover:bg-white/10 transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Email Direct
+                </motion.button>
+              </div>
             </motion.div>
           </motion.div>
         )}
