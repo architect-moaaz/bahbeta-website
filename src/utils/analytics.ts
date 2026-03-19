@@ -54,10 +54,20 @@ export const trackScrollDepth = (percentage: number) => {
   }
 };
 
-// Page view tracking (automatically handled by Vercel Analytics)
-// but you can add custom page view events if needed
 export const trackPageView = (pageName: string) => {
   track('page_view', {
     page_name: pageName,
+  });
+};
+
+export const trackNFCProductView = (type: 'metal' | 'pvc') => {
+  track('nfc_product_view', {
+    card_type: type,
+  });
+};
+
+export const trackSectionView = (sectionId: string) => {
+  track('section_view', {
+    section_id: sectionId,
   });
 };
